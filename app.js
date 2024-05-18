@@ -1,8 +1,10 @@
+const ZIP_CODE = ''
+
 const cheerio = require("cheerio")
 
 let gasprices = []
 
-fetch("https://www.gasbuddy.com/home?search=76182&fuel=1&method=all&maxAge=0")
+fetch(`https://www.gasbuddy.com/home?search={ZIP_CODE}&fuel=1&method=all&maxAge=0`)
 .then(res => {
     res.text()
     .then(html => {
