@@ -21,7 +21,7 @@ fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge
                 recorded_time: $(x).find(".ReportedBy-module__postedTime___J5H9Z").text(),
             }
             if (y.station_name !== '') {
-                console.log(y)
+                console.log(JSON.stringify(y) + ",")
             }
         })
     })
@@ -40,6 +40,6 @@ if (SAMS_CLUB_ENABLED) {
             recorded_time: Date.now()
         }
 
-        console.log(gasdata)
+        console.log(JSON.stringify(gasdata) + ",")
     })
 }
