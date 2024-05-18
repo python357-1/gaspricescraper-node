@@ -1,10 +1,12 @@
 const ZIP_CODE = ''
+const SAMS_CLUB_ENABLED = false
+const SAMS_CLUB_URL = '' // if sams club scraping is enabled, the url must be set to a particular sams club. you can find a location by zip code at https://www.samsclub.com/locator
 
 const cheerio = require("cheerio")
 
 let gasprices = []
 
-fetch(`https://www.gasbuddy.com/home?search={ZIP_CODE}&fuel=1&method=all&maxAge=0`)
+fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge=0`)
 .then(res => {
     res.text()
     .then(html => {
@@ -24,3 +26,20 @@ fetch(`https://www.gasbuddy.com/home?search={ZIP_CODE}&fuel=1&method=all&maxAge=
         })
     })
 })
+
+if (SAMS_CLUB_ENABLED) {
+    fetch(SAMS_CLUB_URL)
+    .then(res => res.text())
+    .then(html => {
+        let $ = cheerio.load(html)
+        var gasdata = {
+            station_name: $(".sc-club-title-name").text(),
+            address: $(".sc-club-address").text(),
+            price: $($(".sc-gas-price")['0']).text().substring(0, 4),
+            scraped_time: Date.now(),
+            recorded_time: Date.now()
+        }
+
+        console.log(gasdata)
+    })
+}
