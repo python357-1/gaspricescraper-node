@@ -47,7 +47,7 @@ if (SAMS_CLUB_ENABLED) {
         let $ = cheerio.load(html)
         var station_name = $(".sc-club-title-name").text();
         var address = $(".sc-club-address").text();
-        var price = $($(".sc-gas-price")['0']).text().substring(0, 4)
+        var price = normalizePrice($($(".sc-gas-price")['0']).text().substring(0, 4))
         var scraped_time = Date.now();
         var recorded_time = Date.now();
 
