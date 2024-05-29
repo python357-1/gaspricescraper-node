@@ -4,6 +4,16 @@ const SAMS_CLUB_URL = '' // if sams club scraping is enabled, the url must be se
 
 const cheerio = require("cheerio")
 
+function normalizePrice(str) {
+    if (str.includes("-")) {
+        return 0
+    }
+    if (str.startsWith("$")) {
+        return parseFloat(str.substring(1))
+    }
+    return parseFloat(str)
+}
+
 let gasprices = []
 
 fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge=0`)
@@ -13,15 +23,18 @@ fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge
         let $ = cheerio.load(html)
         var panels = $(".panel__panel___3Q2zW")
         Array.from(panels).forEach(x => {
-            var y = {
-                station_name: $(x).find(".header__header3___1b1oq").text(),
-                address: $(x).find(".StationDisplay-module__address___2_c7v").text(),
-                price: $(x).find(".StationDisplayPrice-module__price___3rARL").text(),
-                scraped_time: Date.now(),
-                recorded_time: $(x).find(".ReportedBy-module__postedTime___J5H9Z").text(),
+            var station_name = $(x).find(".header__header3___1b1oq").text().trim();
+            var address = $(x).find(".StationDisplay-module__address___2_c7v").text().trim();
+            var price = normalizePrice($(x).find(".StationDisplayPrice-module__price___3rARL").text());
+            var scraped_time = Date.now();
+            var recorded_time = $(x).find(".ReportedBy-module__postedTime___J5H9Z").text().trim();
+                
+            if (recorded_time == "") {
+                recorded_time = scraped_time
             }
-            if (y.station_name !== '') {
-                console.log(JSON.stringify(y) + ",")
+
+            if (station_name !== '') {
+                console.log(`${station_name}@@@${address}@@@${price}@@@${scraped_time}@@@${recorded_time}`)
             }
         })
     })
@@ -32,14 +45,12 @@ if (SAMS_CLUB_ENABLED) {
     .then(res => res.text())
     .then(html => {
         let $ = cheerio.load(html)
-        var gasdata = {
-            station_name: $(".sc-club-title-name").text(),
-            address: $(".sc-club-address").text(),
-            price: $($(".sc-gas-price")['0']).text().substring(0, 4),
-            scraped_time: Date.now(),
-            recorded_time: Date.now()
-        }
+        var station_name = $(".sc-club-title-name").text();
+        var address = $(".sc-club-address").text();
+        var price = $($(".sc-gas-price")['0']).text().substring(0, 4)
+        var scraped_time = Date.now();
+        var recorded_time = Date.now();
 
-        console.log(JSON.stringify(gasdata) + ",")
+        console.log(`${station_name}@@@${address}@@@${price}@@@${scraped_time}@@@${recorded_time}`)
     })
 }
