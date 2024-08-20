@@ -16,7 +16,7 @@ function normalizePrice(str) {
 
 let gasprices = []
 
-fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge=0`)
+fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge=0`, {headers: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}})
 .then(res => {
     res.text()
     .then(html => {
@@ -41,16 +41,16 @@ fetch(`https://www.gasbuddy.com/home?search=${ZIP_CODE}&fuel=1&method=all&maxAge
 })
 
 if (SAMS_CLUB_ENABLED) {
-    fetch(SAMS_CLUB_URL)
+    fetch(SAMS_CLUB_URL, {headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}})
     .then(res => res.text())
     .then(html => {
-        let $ = cheerio.load(html)
-        var station_name = $(".sc-club-title-name").text();
-        var address = $(".sc-club-address").text();
-        var price = normalizePrice($($(".sc-gas-price")['0']).text().substring(0, 4))
+        let $ = cheerio.load(html);
+        var station_name = $(".sc-club-general-info-card-club-name").text();
+        var address = $("div.sc-club-general-info-card-line-wrapper:nth-child(1)").text();
+        var price = normalizePrice($(".sc-club-gas-prices-grid > div:nth-child(1) > div:nth-child(2)").text().substring(0, 4))
         var scraped_time = Date.now();
         var recorded_time = Date.now();
 
-        console.log(`${station_name}@@@${address}@@@${price}@@@${scraped_time}@@@${recorded_time}`)
+       console.log(`${station_name}@@@${address}@@@${price}@@@${scraped_time}@@@${recorded_time}`)
     })
 }
